@@ -77,6 +77,8 @@
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+    overscroll-behavior: none;
+    touch-action: manipulation;
   }
 }
 
@@ -92,17 +94,11 @@
 }
 
 /* Prevent bounce effect on iOS */
-html {
+html, body {
   position: fixed;
+  width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-body {
-  position: fixed;
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
 }
 
 /* iOS safe area insets */
@@ -134,16 +130,29 @@ button {
   animation: cardFlip 0.5s ease-in-out;
 }
 
-/* Pull-to-refresh animation */
-@keyframes pullToRefresh {
-  0% {
-    transform: translateY(-100%);
+/* Card reveal animation */
+@keyframes cardReveal {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
   }
-  100% {
-    transform: translateY(0);
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
-.pull-to-refresh {
-  animation: pullToRefresh 0.3s ease-out;
+.card-reveal {
+  animation: cardReveal 0.3s ease-out;
+}
+
+/* Button press animation */
+@keyframes buttonPress {
+  to {
+    transform: scale(0.95);
+  }
+}
+
+.button-press {
+  animation: buttonPress 0.1s ease-out;
 }
