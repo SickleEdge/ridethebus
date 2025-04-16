@@ -35,4 +35,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out
           commit_message: "Deploy to GitHub Pages"
-          publish_branch: main 
+          publish_branch: gh-pages
+          user_name: 'sickleedge'
+          user_email: 'ejdarkbark17@gmail.com' 
