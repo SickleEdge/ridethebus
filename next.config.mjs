@@ -23,14 +23,12 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
+    serverActions: true,
   },
   // Export the app as static HTML/CSS/JS
   output: 'export',
   // Set the base path to match the GitHub repository name
-  basePath: process.env.NODE_ENV === 'production' ? '/ridethebus' : '',
+  basePath: '/ridethebus',
   // Disable server components for static export
   reactStrictMode: true,
 }
