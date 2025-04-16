@@ -9,6 +9,20 @@ let connectionAttemptInProgress = false
 let lastConnectionTime = 0
 const RECONNECT_THROTTLE_MS = 5000 // Prevent reconnections within 5 seconds
 
+// Helper function to get the WebSocket URL based on the current environment
+const getWebSocketUrl = () => {
+  if (typeof window === 'undefined') return "";
+  
+  // In development or when hosted locally
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return "ws://localhost:3001";
+  }
+  
+  // When hosted on GitHub Pages or other production environment
+  // This should be updated with your actual production WebSocket server URL
+  return "wss://your-websocket-server.com";
+}
+
 interface Room {
   id: string
   players: { name: string; score: number }[]
@@ -26,8 +40,16 @@ export default function RoomList() {
   const [retryCount, setRetryCount] = useState(0)
   const [reconnectTimeout, setReconnectTimeout] = useState<NodeJS.Timeout | null>(null)
   const mountedRef = useRef(true)
+  const [wsUrl, setWsUrl] = useState<string>("")
+
+  // Set WebSocket URL after component mounts
+  useEffect(() => {
+    setWsUrl(getWebSocketUrl());
+  }, []);
 
   const connect = useCallback(() => {
+    if (!wsUrl) return;
+    
     // Strict throttling and singleton connection enforcement
     const now = Date.now()
     if (
@@ -49,7 +71,7 @@ export default function RoomList() {
     
     try {
       console.log("[ROOMLIST] Creating WebSocket connection (STRICTLY CONTROLLED)")
-      const newWs = new WebSocket("ws://localhost:3001")
+      const newWs = new WebSocket(wsUrl)
       globalWs = newWs
       
       newWs.onopen = () => {
@@ -141,7 +163,7 @@ export default function RoomList() {
       setErrorDetails(err.stack || "No stack trace available")
       setIsConnecting(false)
     }
-  }, [retryCount, reconnectTimeout])
+  }, [wsUrl, retryCount, reconnectTimeout])
 
   useEffect(() => {
     mountedRef.current = true;

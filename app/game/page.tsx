@@ -1,7 +1,21 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+
+// Helper function to get WebSocket base URL
+const getWebSocketBaseUrl = () => {
+  if (typeof window === 'undefined') return "";
+  
+  // In development or when hosted locally
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return "ws://localhost:3001";
+  }
+  
+  // When hosted on GitHub Pages or other production environment
+  // This should be updated with your actual production WebSocket server URL
+  return "wss://your-websocket-server.com";
+}
 
 // Track game connections separately from room list connections
 let gameConnections = new Map<string, WebSocket>() // roomId:playerName -> WebSocket
@@ -23,7 +37,8 @@ interface GameState {
   winners: string[]
 }
 
-export default function GamePage() {
+// Wrap the main component with Suspense
+function GamePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const roomId = searchParams.get("room")
@@ -89,7 +104,15 @@ export default function GamePage() {
     connectionAttemptsInProgress.add(connectionKey)
     lastConnectionAttempts.set(connectionKey, now)
     
-    const wsUrl = `ws://localhost:3001?room=${encodeURIComponent(roomId)}&name=${encodeURIComponent(playerName)}`
+    const baseWsUrl = getWebSocketBaseUrl();
+    if (!baseWsUrl) {
+      setError("Unable to determine WebSocket server URL. Please try again later.");
+      connectionAttemptsInProgress.delete(connectionKey);
+      setIsConnecting(false);
+      return;
+    }
+    
+    const wsUrl = `${baseWsUrl}?room=${encodeURIComponent(roomId)}&name=${encodeURIComponent(playerName)}`
     console.log(`[GAME] Connecting to WebSocket: ${wsUrl}`)
     
     try {
@@ -648,5 +671,18 @@ export default function GamePage() {
         )}
       </div>
     </div>
+  )
+}
+
+// The main export with Suspense
+export default function GamePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 to-pink-900 p-4 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <GamePageContent />
+    </Suspense>
   )
 } 

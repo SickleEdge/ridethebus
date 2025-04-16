@@ -27,6 +27,12 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  // Export the app as static HTML/CSS/JS
+  output: 'export',
+  // Set the base path to match the GitHub repository name
+  basePath: process.env.NODE_ENV === 'production' ? '/ridethebus' : '',
+  // Disable server components for static export
+  reactStrictMode: true,
 }
 
 if (userConfig) {
