@@ -35,4 +35,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out
           commit_message: "Deploy to GitHub Pages"
-          branch: gh-pages 
+          publish_branch: main 
